@@ -1331,8 +1331,16 @@ function getInverterRealtimeData(id) {
     });
 }
 
+function setArchivData(data, id, name) {
+    var values = data[name];
+    var keys = Object.keys(values);
+    var daten = values[keys[keys.length - 1]];
+    adapter.setState("inverter." + id + "." + name, { val: daten, ack: true });
+    return daten;
+}
+
 //Get Infos from Inverter
-function GetArchiveData(id) {
+function getArchiveData(id) {
     // fallback if no id set
     if (id == "") {
         id = 1;
@@ -1340,7 +1348,7 @@ function GetArchiveData(id) {
 
     var today = new Date();
     var datum = today.getDate() + "." + (today.getMonth() + 1) + "." + today.getFullYear();
-    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Temperature_Powerstage&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2', function (error, response, body) {
+    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Temperature_Powerstage&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2&Channel=EnergyReal_WAC_Minus_Absolute&Channel=EnergyReal_WAC_Plus_Absolute', function (error, response, body) {
         if (!error && response.statusCode == 200) {
             try {
                 const data = JSON.parse(body);
@@ -1350,34 +1358,17 @@ function GetArchiveData(id) {
                     const resp = inverter.Data;
                     createArchiveObjects(id, resp);
 
-                    var values = inverter.Data.Current_DC_String_1.Values;
-                    var keys = Object.keys(values);
-                    var s1current = values[keys[keys.length - 1]];
-                    adapter.setState("inverter." + id + ".Current_DC_String_1", { val: s1current, ack: true });
+                    setArchivData(inverter.Data, id, "Temperature_Powerstage");
+                    setArchivData(inverter.Data, id, "EnergyReal_WAC_Minus_Absolute");
+                    setArchivData(inverter.Data, id, "EnergyReal_WAC_Plus_Absolute");
 
-                    var values = inverter.Data.Current_DC_String_2.Values;
-                    var keys = Object.keys(values);
-                    var s2current = values[keys[keys.length - 1]];
-                    adapter.setState("inverter." + id + ".Current_DC_String_2", { val: s2current, ack: true });
-
-                    var values = inverter.Data.Temperature_Powerstage.Values;
-                    var keys = Object.keys(values);
-                    var daten = values[keys[keys.length - 1]];
-                    adapter.setState("inverter." + id + ".Temperature_Powerstage", { val: daten, ack: true });
-
-                    var values = inverter.Data.Voltage_DC_String_1.Values;
-                    var keys = Object.keys(values);
-                    var s1voltage = values[keys[keys.length - 1]];
-                    adapter.setState("inverter." + id + ".Voltage_DC_String_1", { val: s1voltage, ack: true });
-
-                    var values = inverter.Data.Voltage_DC_String_2.Values;
-                    var keys = Object.keys(values);
-                    var s2voltage = values[keys[keys.length - 1]];
-                    adapter.setState("inverter." + id + ".Voltage_DC_String_2", { val: s2voltage, ack: true });
+                    var s1current = setArchivData(inverter.Data, id, "Current_DC_String_1");
+                    var s2current = setArchivData(inverter.Data, id, "Current_DC_String_2");
+                    var s1voltage = setArchivData(inverter.Data, id, "Voltage_DC_String_1");
+                    var s2voltage = setArchivData(inverter.Data, id, "Voltage_DC_String_2");
 
                     adapter.setState("inverter." + id + ".Power_DC_String_1", { val: s1voltage * s1current, ack: true });
                     adapter.setState("inverter." + id + ".Power_DC_String_2", { val: s2voltage * s2current, ack: true });
-
                 } else {
                     adapter.log.warn(data.Head.Status.Reason + " archive: " + id);
                 }
@@ -3391,7 +3382,7 @@ function getInverterInfo() {
                         createInverterInfoObjects(keys[inv], resp);
                         for (var par in resp) {
                             if (par.toString() == "CustomName") {
-                                adapter.setState("inverterinfo." + keys[inv].toString() + "." + par.toString(), { val: convertCustomname(resp[par.toString()]), ack: true });
+                                adapter.setState("inverterinfo." + keys[inv].toString() + "." + par.toString(), { val: getCustomname(resp[par.toString()]), ack: true });
                             }
                             else if (par.toString() == "DT") {
                                 adapter.setState("inverterinfo." + keys[inv].toString() + ".DT", { val: resp[par.toString()], ack: true });
@@ -3412,7 +3403,7 @@ function getInverterInfo() {
     });
 }
 
-function convertCustomname(nameraw) {
+function getCustomname(nameraw) {
     var out = "";
     nameraw.split(';').forEach(function (entry) {
         if (entry != "") {
@@ -3751,7 +3742,7 @@ function checkArchiveStatus() {
                     if (result.alive) {
                         if (apiver === 1) {
                             adapter.config.inverter.split(',').forEach(function (entry) {
-                                GetArchiveData(entry);
+                                getArchiveData(entry);
                             });
                         }
 
