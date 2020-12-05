@@ -512,6 +512,36 @@ function createArchiveObjects(id, obj) {
             native: {}
         });
     }
+    if (obj.hasOwnProperty("EnergyReal_WAC_Minus_Absolute")) {
+        adapter.setObjectNotExists('inverter.' + id + '.EnergyReal_WAC_Minus_Absolute', {
+            type: "state",
+            common: {
+                name: "EnergyReal_WAC_Minus_Absolute",
+                type: "number",
+                role: "value",
+                unit: "Wh",
+                read: true,
+                write: false,
+                desc: "EnergyReal_WAC_Minus_Absolute"
+            },
+            native: {}
+        });
+    }
+    if (obj.hasOwnProperty("EnergyReal_WAC_Plus_Absolute")) {
+        adapter.setObjectNotExists('inverter.' + id + '.EnergyReal_WAC_Plus_Absolute', {
+            type: "state",
+            common: {
+                name: "EnergyReal_WAC_Plus_Absolute",
+                type: "number",
+                role: "value",
+                unit: "Wh",
+                read: true,
+                write: false,
+                desc: "EnergyReal_WAC_Plus_Absolute"
+            },
+            native: {}
+        });
+    }
 
     // wait a bit for creating the previous objects before creating the fallback once
     setTimeout(function () {
