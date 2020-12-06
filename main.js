@@ -512,36 +512,6 @@ function createArchiveObjects(id, obj) {
             native: {}
         });
     }
-    if (obj.hasOwnProperty("EnergyReal_WAC_Minus_Absolute")) {
-        adapter.setObjectNotExists('inverter.' + id + '.EnergyReal_WAC_Minus_Absolute', {
-            type: "state",
-            common: {
-                name: "EnergyReal_WAC_Minus_Absolute",
-                type: "number",
-                role: "value",
-                unit: "Wh",
-                read: true,
-                write: false,
-                desc: "EnergyReal_WAC_Minus_Absolute"
-            },
-            native: {}
-        });
-    }
-    if (obj.hasOwnProperty("EnergyReal_WAC_Plus_Absolute")) {
-        adapter.setObjectNotExists('inverter.' + id + '.EnergyReal_WAC_Plus_Absolute', {
-            type: "state",
-            common: {
-                name: "EnergyReal_WAC_Plus_Absolute",
-                type: "number",
-                role: "value",
-                unit: "Wh",
-                read: true,
-                write: false,
-                desc: "EnergyReal_WAC_Plus_Absolute"
-            },
-            native: {}
-        });
-    }
 
     // wait a bit for creating the previous objects before creating the fallback once
     setTimeout(function () {
@@ -1362,12 +1332,15 @@ function getInverterRealtimeData(id) {
 }
 
 function setArchiveData(obj, id, name) {
-    const messwertobj = obj[name];
-    const messwerte = messwertobj.Values;
-    const keys = Object.keys(messwerte);
-    const daten = messwerte[keys[keys.length - 1]];
-    adapter.setState("inverter." + id + "." + name, { val: daten, ack: true });
-    return daten;
+    if (obj.hasOwnProperty(name)) {
+        const valueobj = obj[name];
+        const valuetimeseries = valueobj.Values;
+        const keys = Object.keys(valuetimeseries);
+        const lastvalue = valuetimeseries[keys[keys.length - 1]];
+        adapter.setState("inverter." + id + "." + name, { val: lastvalue, ack: true });
+        return lastvalue;
+    }
+    return;
 }
 
 //Get Infos from Inverter
@@ -1379,7 +1352,7 @@ function getArchiveData(id) {
 
     var today = new Date();
     var datum = today.getDate() + "." + (today.getMonth() + 1) + "." + today.getFullYear();
-    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Temperature_Powerstage&Channel=EnergyReal_WAC_Minus_Absolute&Channel=EnergyReal_WAC_Plus_Absolute', function (error, response, body) {
+    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2&Channel=Temperature_Powerstage', function (error, response, body) {
         if (!error && response.statusCode == 200) {
             try {
                 const data = JSON.parse(body);
@@ -1392,29 +1365,6 @@ function getArchiveData(id) {
                     createArchiveObjects(id, resp);
 
                     setArchiveData(resp, id, "Temperature_Powerstage");
-                    setArchiveData(resp, id, "EnergyReal_WAC_Minus_Absolute");
-                    setArchiveData(resp, id, "EnergyReal_WAC_Plus_Absolute");
-                } else {
-                    adapter.log.warn(data.Head.Status.Reason + " archive: " + id);
-                }
-
-            } catch (e) {
-                adapter.log.warn(e);
-            }
-        }
-    });
-    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2', function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            try {
-                const data = JSON.parse(body);
-                if ("Body" in data) {
-                    adapter.log.debug("ID: " + id + "  Daten: " + data);
-
-                    const inverter = data.Body.Data["inverter/" + id];
-
-                    const resp = inverter.Data;
-                    createArchiveObjects(id, resp);
-
                     const s1current = setArchiveData(resp, id, "Current_DC_String_1");
                     const s2current = setArchiveData(resp, id, "Current_DC_String_2");
                     const s1voltage = setArchiveData(resp, id, "Voltage_DC_String_1");
