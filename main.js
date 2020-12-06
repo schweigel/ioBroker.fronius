@@ -3763,6 +3763,7 @@ function checkArchiveStatus() {
         if (err) {
             adapter.log.error(err);
         }
+        adapter.log.debug("checkArchiveStatus()");
         if (result) {
             // now try if we can really read data from the API. If not do not further process
             request.get(requestType + ip + '/solar_api/GetAPIVersion.cgi', function (error, response, body) {
