@@ -1362,6 +1362,7 @@ function getInverterRealtimeData(id) {
 }
 
 function setArchivData(data, id, name) {
+    adapter.log.debug("ID: " + id + "  Name: " + name);
     var values = data[name].Values;
     var keys = Object.keys(values);
     var daten = values[keys[keys.length - 1]];
