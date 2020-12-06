@@ -1362,7 +1362,7 @@ function getInverterRealtimeData(id) {
 }
 
 function setArchivData(data, id, name) {
-    var values = data[name];
+    var values = data[name].Values;
     var keys = Object.keys(values);
     var daten = values[keys[keys.length - 1]];
     adapter.setState("inverter." + id + "." + name, { val: daten, ack: true });
@@ -1388,14 +1388,14 @@ function getArchiveData(id) {
                     const resp = inverter.Data;
                     createArchiveObjects(id, resp);
 
-                    setArchivData(inverter.Data, id, "Temperature_Powerstage");
-                    setArchivData(inverter.Data, id, "EnergyReal_WAC_Minus_Absolute");
-                    setArchivData(inverter.Data, id, "EnergyReal_WAC_Plus_Absolute");
+                    setArchivData(resp, id, "Temperature_Powerstage");
+                    setArchivData(resp, id, "EnergyReal_WAC_Minus_Absolute");
+                    setArchivData(resp, id, "EnergyReal_WAC_Plus_Absolute");
 
-                    var s1current = setArchivData(inverter.Data, id, "Current_DC_String_1");
-                    var s2current = setArchivData(inverter.Data, id, "Current_DC_String_2");
-                    var s1voltage = setArchivData(inverter.Data, id, "Voltage_DC_String_1");
-                    var s2voltage = setArchivData(inverter.Data, id, "Voltage_DC_String_2");
+                    var s1current = setArchivData(resp, id, "Current_DC_String_1");
+                    var s2current = setArchivData(resp, id, "Current_DC_String_2");
+                    var s1voltage = setArchivData(resp, id, "Voltage_DC_String_1");
+                    var s2voltage = setArchivData(resp, id, "Voltage_DC_String_2");
 
                     adapter.setState("inverter." + id + ".Power_DC_String_1", { val: s1voltage * s1current, ack: true });
                     adapter.setState("inverter." + id + ".Power_DC_String_2", { val: s2voltage * s2current, ack: true });
