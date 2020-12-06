@@ -1363,7 +1363,8 @@ function getInverterRealtimeData(id) {
 
 function setArchivData(data, id, name) {
     adapter.log.debug("ID: " + id + "  Name: " + name);
-    var values = data[name].Values;
+    var messwert = data[name];
+    var values = messwert.Values;
     var keys = Object.keys(values);
     var daten = values[keys[keys.length - 1]];
     adapter.setState("inverter." + id + "." + name, { val: daten, ack: true });
@@ -1384,6 +1385,8 @@ function getArchiveData(id) {
             try {
                 const data = JSON.parse(body);
                 if ("Body" in data) {
+                    adapter.log.debug("ID: " + id + "  Daten: " + data);
+                    
                     var inverter = data.Body.Data["inverter/" + id];
 
                     const resp = inverter.Data;
