@@ -1377,7 +1377,6 @@ function getArchiveData(id) {
     if (id == "") {
         id = 1;
     }
-    adapter.log.debug("ID: " + id + "  getArchiveData()");
 
     var today = new Date();
     var datum = today.getDate() + "." + (today.getMonth() + 1) + "." + today.getFullYear();
@@ -1391,7 +1390,7 @@ function getArchiveData(id) {
 
                     var inverter = data.Body.Data["inverter/" + id];
 
-                    const resp = inverter.Data;
+                    var resp = inverter.Data;
                     createArchiveObjects(id, resp);
 
                     setArchivData(resp, id, "Temperature_Powerstage");
@@ -3763,7 +3762,6 @@ function checkArchiveStatus() {
         if (err) {
             adapter.log.error(err);
         }
-        adapter.log.debug("checkArchiveStatus()");
         if (result) {
             // now try if we can really read data from the API. If not do not further process
             request.get(requestType + ip + '/solar_api/GetAPIVersion.cgi', function (error, response, body) {
