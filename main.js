@@ -1377,16 +1377,18 @@ function getArchiveData(id) {
     if (id == "") {
         id = 1;
     }
+    adapter.log.debug("ID: " + id + "  getArchiveData()");
 
     var today = new Date();
     var datum = today.getDate() + "." + (today.getMonth() + 1) + "." + today.getFullYear();
-    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Temperature_Powerstage&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2&Channel=EnergyReal_WAC_Minus_Absolute&Channel=EnergyReal_WAC_Plus_Absolute', function (error, response, body) {
+    //request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Temperature_Powerstage&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2&Channel=EnergyReal_WAC_Minus_Absolute&Channel=EnergyReal_WAC_Plus_Absolute', function (error, response, body) {
+    request.get(requestType + ip + baseurl + 'GetArchiveData.cgi?Scope=System&StartDate=' + datum + '&EndDate=' + datum + '&Channel=Current_DC_String_1&Channel=Current_DC_String_2&Channel=Temperature_Powerstage&Channel=Voltage_DC_String_1&Channel=Voltage_DC_String_2', function (error, response, body) {
         if (!error && response.statusCode == 200) {
             try {
                 const data = JSON.parse(body);
                 if ("Body" in data) {
                     adapter.log.debug("ID: " + id + "  Daten: " + data);
-                    
+
                     var inverter = data.Body.Data["inverter/" + id];
 
                     const resp = inverter.Data;
