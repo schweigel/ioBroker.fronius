@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "fronius",
-        "version": "1.1.2",
+        "version": "1.1.3",
         "news": {
-            "1.1.2": {
+            "1.1.3": {
                 "en": "Added DC current, voltage and power for both strings and tempreture of archive request and added device type mapping",
                 "de": "DC Stromstärke, Spannung und Leistung für beide Strings und Temperatur aus Archivanfrage sowie Gerätetypzuordnung hinzugefügt",
                 "ru": "Добавлен постоянный ток, напряжение и мощность как для строк, так и для времени запроса архива, а также добавлено сопоставление типов устройств",
@@ -210,34 +210,6 @@
                 "write": false,
                 "def": false,
                 "desc": "Is Fronius inverter connected?"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.HWVersion",
-            "type": "state",
-            "common": {
-                "name": "Hardware Version",
-                "type": "string",
-                "role": "meta",
-                "read": true,
-                "write": false,
-                "def": "",
-                "desc": "Hardware Version"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.SWVersion",
-            "type": "state",
-            "common": {
-                "name": "Software Version",
-                "type": "string",
-                "role": "meta",
-                "read": true,
-                "write": false,
-                "def": "",
-                "desc": "Software Version"
             },
             "native": {}
         },
